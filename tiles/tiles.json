@@ -4,22 +4,18 @@
         "ground": {
             "bricks": "Bricks.png",
             "grass": "",
-            "dirt": "",
+            "dirt": "Dirt.png",
             "sand": ""
         },
         "wall": {
             "north": "",
-            "north-east-int": "",
-            "north-east-ext": "",
+            "north-east": "",
             "east": "",
-            "south-east-int": "",
-            "south-east-ext": "",
+            "south-east": "",
             "south": "",
-            "south-west-int": "",
-            "south-west-ext": "",
+            "south-west": "",
             "west": "",
-            "north-west-int": "",
-            "north-west-ext": ""
+            "north-west": ""
         },
         "feature": {}
     },
@@ -30,17 +26,13 @@
         },
         "wall": {
             "north": "",
-            "north-east-int": "",
-            "north-east-ext": "",
+            "north-east": "",
             "east": "",
-            "south-east-int": "",
-            "south-east-ext": "",
+            "south-east": "",
             "south": "",
-            "south-west-int": "",
-            "south-west-ext": "",
+            "south-west": "",
             "west": "",
-            "north-west-int": "",
-            "north-west-ext": ""
+            "north-west": ""
         },
         "feature": {}
     },
