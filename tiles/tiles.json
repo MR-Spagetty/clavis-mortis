@@ -1,0 +1,56 @@
+{
+    "outside": {
+        "door": {},
+        "ground": {
+            "bricks": "Bricks.png",
+            "grass": "",
+            "dirt": "",
+            "sand": ""
+        },
+        "wall": {
+            "north": "",
+            "north-east-int": "",
+            "north-east-ext": "",
+            "east": "",
+            "south-east-int": "",
+            "south-east-ext": "",
+            "south": "",
+            "south-west-int": "",
+            "south-west-ext": "",
+            "west": "",
+            "north-west-int": "",
+            "north-west-ext": ""
+        },
+        "feature": {}
+    },
+    "inside": {
+        "door": {},
+        "ground": {
+            "planks": "Planks.png"
+        },
+        "wall": {
+            "north": "",
+            "north-east-int": "",
+            "north-east-ext": "",
+            "east": "",
+            "south-east-int": "",
+            "south-east-ext": "",
+            "south": "",
+            "south-west-int": "",
+            "south-west-ext": "",
+            "west": "",
+            "north-west-int": "",
+            "north-west-ext": ""
+        },
+        "feature": {}
+    },
+    "other": {
+        "door": {},
+        "ground": {
+            "blank": "",
+            "concrete": "Concrete.png"
+        },
+        "wall": {},
+        "feature": {}
+    }
+}
