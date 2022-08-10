@@ -3,18 +3,16 @@
         "door": {},
         "ground": {
             "bricks": "Bricks.png",
-            "grass": "",
+            "grass": "Grass.png",
             "dirt": "Dirt.png",
             "sand": ""
         },
         "wall": {
-            "north": "",
+            "horizontal": "Horizontal.png",
+            "vertical": "",
             "north-east": "",
-            "east": "",
             "south-east": "",
-            "south": "",
             "south-west": "",
-            "west": "",
             "north-west": ""
         },
         "feature": {}
