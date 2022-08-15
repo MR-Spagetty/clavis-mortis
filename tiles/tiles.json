@@ -9,7 +9,7 @@
         },
         "wall": {
             "horizontal": "Horizontal.png",
-            "vertical": "",
+            "vertical": "Vertical.png",
             "north-east": "",
             "south-east": "",
             "south-west": "",
