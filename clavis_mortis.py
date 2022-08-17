@@ -63,3 +63,23 @@ class Texture(QPixmap):
             navigator = navigator.copy()[info]
         texture_path.append(navigator[infos[-1]])
         return os.path.join(initial_folder, *texture_path)
+
+
+class Tile:
+    def __init__(self, texture: Texture):
+        self.texture = QIcon(texture)
+
+
+class Level:
+    def __init__(self, path: str | bytes):
+        pass
+
+
+class Player:
+    def __init__(self):
+        pass
+
+
+class Game:
+    def __init__(self):
+        pass
