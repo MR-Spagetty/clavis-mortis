@@ -10,10 +10,11 @@
         "wall": {
             "horizontal": "Horizontal.png",
             "vertical": "Vertical.png",
-            "north-east": "",
-            "south-east": "",
-            "south-west": "",
-            "north-west": ""
+            "north-east": "NE.png",
+            "south-east": "SE.png",
+            "south-west": "SW.png",
+            "north-west": "NW.png",
+            "intersection": "VertHorizontal_intersection.png"
         },
         "feature": {}
     },
