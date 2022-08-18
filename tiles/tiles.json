@@ -5,7 +5,7 @@
             "bricks": "Bricks.png",
             "grass": "Grass.png",
             "dirt": "Dirt.png",
-            "sand": ""
+            "sand": "Sand.png"
         },
         "wall": {
             "horizontal": "Horizontal.png",
