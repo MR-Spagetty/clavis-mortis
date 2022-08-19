@@ -24,13 +24,14 @@
             "planks": "Planks.png"
         },
         "wall": {
-            "north": "",
+            "horizontal": {
+                "clouds": "Clouds.png",
+                "plain": "Plain.png",
+                "rose_vine": "Rose_vine.png"
+            },
             "north-east": "",
-            "east": "",
             "south-east": "",
-            "south": "",
             "south-west": "",
-            "west": "",
             "north-west": ""
         },
         "feature": {}
