@@ -29,6 +29,16 @@
                 "plain": "Plain.png",
                 "rose_vine": "Rose_vine.png"
             },
+            "vertical": {
+                "clouds": "Clouds.png",
+                "plain": "Plain.png",
+                "rose_vine": "Rose_vine.png"
+            },
+            "intersection": {
+                "clouds": "Clouds.png",
+                "plain": "Plain.png",
+                "rose_vine": "Rose_vine.png"
+            },
             "north-east": "",
             "south-east": "",
             "south-west": "",
