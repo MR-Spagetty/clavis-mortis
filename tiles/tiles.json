@@ -40,7 +40,11 @@
                 "rose_vine": "Rose_vine.png"
             },
             "north-east": "",
-            "south-east": "",
+            "south-east": {
+                "clouds": "Clouds.png",
+                "plain": "Plain.png",
+                "rose_vine": "Rose_vine.png"
+            },
             "south-west": "",
             "north-west": ""
         },
