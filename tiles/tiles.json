@@ -45,7 +45,11 @@
                 "plain": "Plain.png",
                 "rose_vine": "Rose_vine.png"
             },
-            "south-west": "",
+            "south-west": {
+                "clouds": "Clouds.png",
+                "plain": "Plain.png",
+                "rose_vine": "Rose_vine.png"
+            },
             "north-west": ""
         },
         "feature": {}
