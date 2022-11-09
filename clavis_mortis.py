@@ -194,7 +194,7 @@ class Coordinate:
             tuple: a tuple of the layer, x, and y coordinates stored within
             the object
         """
-        return self.layer, self.x, self.y
+        return (self.layer, self.x, self.y)
 
 
 class Player:
@@ -208,7 +208,8 @@ class Player:
         self.x = x
         self.y = y
         self.update = update_function
-        self.code_dialog = CodeDialog()
+        
+        self.update()
 
     def move(self, direction: str, ammount: int = 1):
         match direction:
@@ -253,20 +254,25 @@ class Tile:
             case None:
                 player.move(direction_attempted)
             case "door":
-                player.teleport(Coordinate(self.function_arg))
+                if self.locked:
+                    CodeDialog(self.lock).exec()
+                else:
+                    player.teleport(Coordinate(self.function_arg))
             case "through-door":
                 player.move(direction_attempted, 2)
             case "code":
-                CodeDialog(self.lock).exec()
+                player.dialog(
+                    ""
+                )
             case "wall":
                 player.dialog("That is a wall.")
 
 
 class Level:
-    def __init__(self, path: str | bytes):
+    def __init__(self, game: "Game", path: str | bytes):
         self.textures = {}
         self.map = {}
-        self.codes = {}
+        self.locks = {}
         with open(path, 'r') as level:
             data = json.load(level)
 
@@ -279,12 +285,23 @@ class Level:
         layers = level_data["layers"]
 
         self.start = Coordinate(level_data["start"])
+        end = Coordinate(level_data["end"])
 
         self.construct_walls(level_data["walls"])
+
+        game.player.teleport(self.start)
 
     def load_textures(self, tile_key: dict):
         for key, texture_id in tile_key.items():
             self.textures[key] = Texture(Texture.get_path(texture_id))
+
+    def fill_layer(self, layer_id: str):
+        self.map[layer_id] = [[None * MAX_SIZE] * MAX_SIZE]
+
+    def setup_end(self,
+                  end_coord: Coordinate,
+                  layers: dict):
+        pass
 
     def construct_walls(self, walls_data: list, layers: dict):
         for wall in walls_data:
@@ -297,7 +314,7 @@ class Level:
                     "are not in same layer"
                     )
             elif s_lay not in self.map:
-                self.map[s_lay] = [[None * MAX_SIZE] * MAX_SIZE]
+                self.fill_layer(s_lay)
             for x in range(min(s_x, e_x),
                            max(s_x, e_x) + 1):
                 for y in range(min(s_y, e_y),
@@ -311,37 +328,75 @@ class Level:
         global MAX_SIZE
         for location, data in functions.items():
             lay, x, y = Coordinate(location)()
+            # filling in the layer if it doent already exist
             if lay not in self.map:
-                self.map[lay] = [[None * MAX_SIZE] * MAX_SIZE]
+                self.fill_layer(lay)
+
+            # deciding the arg naem depending on hte function type
+            match data["type"]:
+                case "door":
+                    arg_name = "goes_to"
+                case "dialog":
+                    arg_name = "text"
+                case other:
+                    arg_name = "arg"
+
+            # sorting out the lock
+            lock_id = data.get("lock_id", None)
+            if lock_id not in self.locks:
+                self.locks[lock_id] = Lock()
+
+            # creating the tile
             self.map[lay][y][x] = Tile(
                 self.textures[layers[lay][y][x]],
-                data["type"],
+                data["type"], data.get(arg_name, None),
+                data.get("locked", False), self.locks[lock_id]
             )
 
     def construct_map(self, layers: dict):
         global MAX_SIZE
         for layer_id, layer in layers.items():
             if layer_id not in self.map:
-                self.map[layer_id] = [
-                    [None * MAX_SIZE] * MAX_SIZE
-                    ]
+                self.fill_layer(layer_id)
+            # itterating through the x and y coords the map
             for y in range(MAX_SIZE):
                 for x in range(MAX_SIZE):
-                    self.map[layer_id][y][x] = Tile(
-                        Texture(
-                            self.textures[layer[y][x]]
-                            )
-                    )
+                    # creating the tile
+                    if self.map[layer_id][y][x] is None:
+                        self.map[layer_id][y][x] = Tile(
+                            Texture(
+                                self.textures[layer[y][x]]
+                                )
+                        )
 
 
 class Game:
     def __init__(self):
         self.displays = {
-            i: {} for i in range(MAX_SIZE)
+            y: {} for y in range(MAX_SIZE)
         }
+        self.level = None
+        self.player = None
 
     def add_display_ref(self, display: QPushButton, y: int, x: int):
         self.displays[y][x] = display
+
+    def update_displays(self):
+        """updates the tile displays to show the correct texture
+        """
+        layer = self.player.layer
+        for y in range(MAX_SIZE):
+            for x in range(MAX_SIZE):
+                self.displays[y][x].setIcon(
+                    self.level.map[layer][y][x].texture
+                )
+        self.displays[self.player.y][self.player.x].setIcon(Player.texture)
+
+    def create_player(self, location: Coordinate):
+        self.player = Player(
+            self, self.level, *location(),
+            self.update_displays
+            )
 
 
 class GameWindow(QMainWindow):
