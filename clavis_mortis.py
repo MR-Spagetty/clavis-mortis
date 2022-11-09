@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin python3
 # clavis_mortis.py
 # MR-Spagetty
 
@@ -35,12 +35,20 @@ try:
 except RuntimeError:
     print("So you imported me...")
 
+# chcecking if the game is bundled into an executable
 if getattr(sys, 'frozen', False):
     application_path = os.path.dirname(sys.executable)
 elif __file__:
     application_path = os.path.dirname(__file__)
 file_location = os.path.dirname(os.path.abspath(__file__))
 
+# Checking that the user is using a version of python that has match cases
+if sys.version_info < (3, 10, 0):
+    raise RuntimeError(
+        "You must be using a version of python that is 3.10.0 or newer"
+        )
+
+# the maximum size of the display grid so i don't haev to repeat it
 global MAX_SIZE
 MAX_SIZE = 16
 
@@ -117,6 +125,8 @@ class Lock:
     chars = "0123456789"
 
     def __init__(self):
+        """creates a lock to be used by functional tiles such as doors
+        """
         self.state = True
         self.code = None
         self.fails = 0
@@ -124,15 +134,26 @@ class Lock:
         self.randomize_code()
 
     def randomize_code(self):
+        """randomizes the code
+        """
         self.code = random.sample(Lock.chars, 6)
 
     def increment_failures(self):
+        """if the player inputs the code in wrong this method will keep track
+        of the number of times the player gets the code wrong a number of
+        times beyond a threshold the code will be randomized
+        """
         self.fails += 1
         if self.fails >= 3:
             self.fails = 0
             self.randomize_code()
 
     def get_state(self):
+        """gets the state of the lock
+
+        Returns:
+            bool: the state of the lock
+        """
         return self.state
 
 
@@ -393,6 +414,11 @@ class Game:
         self.displays[self.player.y][self.player.x].setIcon(Player.texture)
 
     def create_player(self, location: Coordinate):
+        """creates the player at the given location
+
+        Args:
+            location (Coordinate): the location to create the player at
+        """
         self.player = Player(
             self, self.level, *location(),
             self.update_displays
