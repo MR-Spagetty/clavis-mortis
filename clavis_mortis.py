@@ -7,7 +7,7 @@ try:
         QApplication, QMainWindow, QWidget,
         QSizePolicy, QGridLayout, QPushButton,
         QTabWidget, QLabel, QDialog, QLineEdit,
-        QVBoxLayout, QMessageBox
+        QVBoxLayout, QHBoxLayout, QMessageBox
     )
     from PySide6.QtGui import QIcon, QPixmap, QScreen
     from PySide6.QtCore import Qt, QSize, QSizeF, QRect
@@ -30,13 +30,19 @@ try:
 except ImportError as error:
     raise ImportError("WHAT HAVE YOU DONE") from error
 
-app = QApplication()
+try:
+    app = QApplication()
+except RuntimeError:
+    print("So you imported me...")
 
 if getattr(sys, 'frozen', False):
     application_path = os.path.dirname(sys.executable)
 elif __file__:
     application_path = os.path.dirname(__file__)
 file_location = os.path.dirname(os.path.abspath(__file__))
+
+global MAX_SIZE
+MAX_SIZE = 16
 
 
 class Texture(QPixmap):
@@ -94,14 +100,14 @@ class CodeDialog(QDialog):
             self.lock.state = False
             QMessageBox(
                 QMessageBox.Icon.Information, "Accepted",
-                "teh code you entered was correct\nthe lock is now unlocked",
+                "the code you entered was correct\nthe lock is now unlocked",
                 QMessageBox.Ok
             ).exec()
         else:
             self.lock.increment_failures()
             QMessageBox(
                 QMessageBox.Icon.Warning, "Denied",
-                "teh code you entered was incorrect\nthe lock is still locked",
+                "the code you entered was incorrect\nthe lock is still locked",
                 QMessageBox.Ok
             ).exec()
         self.close()
@@ -130,17 +136,88 @@ class Lock:
         return self.state
 
 
+class Coordinate:
+    def __init__(
+        self, value: str = "1,0x,0y",
+        min_val: int = 0, max_val: int = 15
+            ):
+        """simple class to make handeling of coordinates easier
+
+        Args:
+            value (str, optional): the layer, x, y values of the coordinate in
+            the form "<str layer>,<int x>x,<int y>y". Defaults to "1,0x,0y".
+            min_val (int, optional): the minimum possible value
+            for an x or y coordinate. Defaults to 0.
+            max_val (int, optional): the maximum possible value
+            for an x or y coordinate. Defaults to 15.
+        """
+        self.min_val = min_val
+        self.max_val = max_val
+
+        self.layer, x, y = value.split(",")
+
+        self.x = self.coord_int(x[:-1])
+        self.y = self.coord_int(y[:-1])
+
+    def coord_int(self, value: str):
+        """function to turn the x and y coordinates given to it into valid
+        intigers.
+
+        Args:
+            value (str): the value to chack the validity of and convert.
+
+        Raises:
+            TypeError: if the given value is not an int.
+            ValueError: if the given value is not within the range of the
+            Coordinate object.
+
+        Returns:
+            int: the validated and converted value.
+        """
+        NUMS = "0123456789"
+        if all(char in NUMS for char in value):
+            new_val = int(value)
+        else:
+            raise TypeError("the given value is not a valid coord_int")
+        if (
+            # if neither end of the range is specified
+            (not all(self.min_val, self.max_val))
+            or
+            # only max end is specified
+            (not self.min_val and new_val <= self.max_val)
+            or
+            # only min end is specified
+            (self.min_val <= new_val and not self.max_val)
+            or
+            # both ends are specified
+            (self.min_val <= new_val <= self.max_val)
+                ):
+            return new_val
+        else:
+            raise ValueError(
+                "the given value does not fall within this coordinate's range"
+                )
+
+    def __call__(self) -> tuple[str, int, int]:
+        """Returns the coordinates when the objecte is called as a function
+
+        Returns:
+            tuple: a tuple of the layer, x, and y coordinates stored within
+            the object
+        """
+        return self.layer, self.x, self.y
+
+
 class Player:
     texture = Texture(Texture.get_path("cm:player"))
 
     def __init__(self, game: "Game", level: "Level",
                  layer: str, x: int, y: int,
-                 dialog_label: QLabel, update_function: "function"
+                 update_function: "function"
                  ):
         self.layer = layer
         self.x = x
         self.y = y
-        self.dialog_label = dialog_label
         self.update = update_function
         self.code_dialog = CodeDialog()
 
@@ -154,19 +231,16 @@ class Player:
                 self.y -= ammount
             case "left" | "west":
                 self.x -= ammount
-        self.reset_dialog()
         self.update()
 
-    def teleport(self, layer: str, x: int, y: int):
-        self.layer, self.x, self.y = layer, x, y
-        self.reset_dialog()
+    def teleport(self, new_coord: Coordinate):
+        self.layer, self.x, self.y = new_coord()
         self.update()
 
     def dialog(self, dialog: str):
-        self.dialog_label.setText(dialog)
-
-    def reset_dialog(self):
-        self.dialog_label.setText("")
+        QMessageBox(
+            QMessageBox.Icon.NoIcon, "Dialog", dialog
+            ).exec()
 
 
 class Tile:
@@ -190,8 +264,7 @@ class Tile:
             case None:
                 player.move(direction_attempted)
             case "door":
-                layer, x, y = self.function_arg.split(",")
-                player.teleport(layer, int(x[:-1]), int(y[:-1]))
+                player.teleport(Coordinate(self.function_arg))
             case "through-door":
                 player.move(direction_attempted, 2)
             case "code":
@@ -207,7 +280,18 @@ class Level:
         self.codes = {}
         with open(path, 'r') as level:
             data = json.load(level)
+
+        # load all the textures needed by the level
         self.load_textures(data["tile_key"])
+
+        # seperate the level data from the texture data
+        level_data = data["level"]
+        # seperate the layers to their own variable for easier referencing
+        layers = level_data["layers"]
+
+        self.start = Coordinate(level_data["start"])
+
+        self.construct_walls(level_data["walls"])
 
     def load_textures(self, tile_key: dict):
         for key, texture_id in tile_key.items():
@@ -216,38 +300,124 @@ class Level:
     def construct_walls(self, walls_data: list, layers: dict):
         for wall in walls_data:
             start, end = wall.split(":")
-            s_lay, s_x, s_y = start.split(",")
-            e_lay, e_x, e_y = end.split(",")
+            s_lay, s_x, s_y = Coordinate(start)()
+            e_lay, e_x, e_y = Coordinate(end)()
             if s_lay != e_lay:
                 raise ValueError(
                     f"start and end points of wall ({wall}) "
                     "are not in same layer"
                     )
             elif s_lay not in self.map:
-                self.map[s_lay] = [[None * 16] * 16]
-            for x in range(min(int(s_x), int(e_x)),
-                           max(int(s_x), int(e_x)) + 1):
-                for y in range(min(int(s_y), int(e_y)),
-                               max(int(s_y), int(e_y)) + 1):
+                self.map[s_lay] = [[None * MAX_SIZE] * MAX_SIZE]
+            for x in range(min(s_x, e_x),
+                           max(s_x, e_x) + 1):
+                for y in range(min(s_y, e_y),
+                               max(s_y, e_y) + 1):
                     self.map[s_lay][y][x] = Tile(
                         self.textures[layers[s_lay][y][x]],
                         "wall"
                     )
 
     def assemble_functional_tiles(self, functions: dict, layers: dict):
+        global MAX_SIZE
         for location, data in functions.items():
-            lay, x, y = location.split(",")
+            lay, x, y = Coordinate(location)()
             if lay not in self.map:
-                self.map[lay] = [[None * 16] * 16]
+                self.map[lay] = [[None * MAX_SIZE] * MAX_SIZE]
             self.map[lay][y][x] = Tile(
                 self.textures[layers[lay][y][x]],
                 data["type"],
             )
 
     def construct_map(self, layers: dict):
-        pass
+        global MAX_SIZE
+        for layer_id, layer in layers.items():
+            if layer_id not in self.map:
+                self.map[layer_id] = [
+                    [None * MAX_SIZE] * MAX_SIZE
+                    ]
+            for y in range(MAX_SIZE):
+                for x in range(MAX_SIZE):
+                    self.map[layer_id][y][x] = Tile(
+                        Texture(
+                            self.textures[layer[y][x]]
+                            )
+                    )
 
 
 class Game:
     def __init__(self):
+        self.displays = {
+            i: {} for i in range(MAX_SIZE)
+        }
+
+    def add_display_ref(self, display: QPushButton, y: int, x: int):
+        self.displays[y][x] = display
+
+
+class GameWindow(QMainWindow):
+    def __init__(self):
+        super(GameWindow, self).__init__()
+        self.setCentralWidget(QTabWidget())
+
+        self.centralWidget().addTab(QWidget(), "Menu")
+
+        self.game = Game()
+
+        self.game_display_layout = QGridLayout()
+        self.game_display_layout.setContentsMargins(0, 0, 0, 0)
+        self.game_display_layout.setSpacing(0)
+        game_tab = QWidget()
+        game_tab.setLayout(QHBoxLayout())
+
+        game_tab.layout().addWidget(QWidget())
+        game_display_layout_widget = QWidget()
+        game_display_layout_widget.setLayout(self.game_display_layout)
+        game_tab.layout().addWidget(game_display_layout_widget)
+        game_tab.layout().addWidget(QWidget())
+
+        self.centralWidget().addTab(game_tab, "Layer 1")
+
+        self.screen().geometryChanged.connect(self.on_window_size_changed)
+        display_height_width = self.screen().geometry().height()//17
+        self.displays_size = QSize(display_height_width, display_height_width)
+
+        self.setup_displays()
+
+    def setup_displays(self):
+        global MAX_SIZE
+        grid = self.game_display_layout
+        for row in range(MAX_SIZE):
+            for column in range(MAX_SIZE):
+                button = QPushButton()
+
+                button.setFlat(True)
+                button.setFixedSize(self.displays_size)
+                button.setIconSize(self.displays_size)
+                grid.addWidget(button, row, column)
+                self.game.add_display_ref(button, row, column)
+
+    def change_displays(self):
         pass
+
+    def on_window_size_changed(self, new_geo: QRect):
+        new_dimensions = new_geo.height()//17
+        print(new_geo.height()//17)
+        self.displays_size.setWidth(new_dimensions)
+        self.displays_size.setHeight(new_dimensions)
+        grid = self.game_display_layout
+        for row in range(MAX_SIZE):
+            for column in range(MAX_SIZE):
+                button = QPushButton()
+
+                button.setFlat(True)
+                button.setFixedSize(self.displays_size)
+                button.setIconSize(self.displays_size)
+                grid.addWidget(button, row, column)
+                self.game.add_display_ref(button, row, column)
+
+
+if __name__ == "__main__":
+    window = GameWindow()
+    window.show()
+    app.exec()
