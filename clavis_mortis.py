@@ -174,24 +174,13 @@ class Coordinate:
         Returns:
             int: the validated and converted value.
         """
-        NUMS = "0123456789"
+        NUMS = "-0123456789"
         if all(char in NUMS for char in value):
             new_val = int(value)
         else:
             raise TypeError("the given value is not a valid coord_int")
-        if (
-            # if neither end of the range is specified
-            (not all(self.min_val, self.max_val))
-            or
-            # only max end is specified
-            (not self.min_val and new_val <= self.max_val)
-            or
-            # only min end is specified
-            (self.min_val <= new_val and not self.max_val)
-            or
-            # both ends are specified
-            (self.min_val <= new_val <= self.max_val)
-                ):
+        # check that the value is within the range of the Coordinate object
+        if (self.min_val <= new_val <= self.max_val):
             return new_val
         else:
             raise ValueError(
