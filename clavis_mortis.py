@@ -51,7 +51,7 @@ if sys.version_info < (3, 10, 0):
         "You must be using a version of python that is 3.10.0 or newer"
         )
 
-# the maximum size of the display grid so i don't haev to repeat it
+# the maximum size of the display grid so i don't have to repeat it
 global MAX_SIZE
 MAX_SIZE = 16
 
@@ -617,7 +617,7 @@ class Level:
                 QMessageBox.Close
             )
             end_dialog.exec()
-            exit()
+            sys.exit()
 
 
 class Game:
@@ -724,13 +724,17 @@ class Game:
         """
         if self.window.centralWidget().currentIndex() == 1:
             dir_x, dir_y, dir_name = direction
-            x = self.player.x + dir_x
-            y = self.player.y - dir_y
+            x = self.player.x + dir_x  # y coords must be subtracted due
+            y = self.player.y - dir_y  # to y = 0 being at the top
+            # telling the tile at the location to that the player is
+            # attempting to enter the tile in the specified direction
             self.level.map[self.player.layer][y][x].attempt_entry(
                 self.player, dir_name
                 )
 
     def start(self):
+        """starts the level
+        """
         self.player.update()
 
 
@@ -746,31 +750,43 @@ class GameWindow(QMainWindow):
 
         self.centralWidget().addTab(QWidget(), "Menu")
 
+        # creating the game to run in the window
         self.game = Game(self, demo_mode)
 
+        # creating the pause key and binding it
         pause_key = QShortcut(self)
         pause_key.setKey("esc")
         pause_key.activated.connect(self.pause)
 
+        # creating the layout for the displays
         self.game_display_layout = QGridLayout()
+        # making it so that there are no gaps between the tile displays
         self.game_display_layout.setContentsMargins(0, 0, 0, 0)
         self.game_display_layout.setSpacing(0)
         game_tab = QWidget()
         game_tab.setLayout(QHBoxLayout())
 
-        game_tab.layout().addWidget(QWidget())
+        # creating the tab the game will run in
+        game_tab.layout().addWidget(QWidget())  # 1*
         game_display_layout_widget = QWidget()
         game_display_layout_widget.setLayout(self.game_display_layout)
         game_tab.layout().addWidget(game_display_layout_widget)
-        game_tab.layout().addWidget(QWidget())
+        game_tab.layout().addWidget(QWidget())  # 1*
+        # 1*:
+        # spacing widgets so that the tile displays dont get pulled appart
+        # when the window is stretched horizontally
 
+        # sticking the game tab into the window
         self.centralWidget().addTab(game_tab, "Game")
 
+        # setting up graphical changes required for the winodw being resized
         self.screen().geometryChanged.connect(self.on_window_size_changed)
         display_height_width = self.screen().geometry().height()//17
         self.displays_size = QSize(display_height_width, display_height_width)
 
+        # final game setup
         self.setup_displays()
+        # starting the game
         self.game.start()
 
     def pause(self):
@@ -786,14 +802,18 @@ class GameWindow(QMainWindow):
         """
         global MAX_SIZE
         grid = self.game_display_layout
+        # itterating through the grid to make all the required displays
         for row in range(MAX_SIZE):
             for column in range(MAX_SIZE):
                 button = QPushButton()
 
-                # button.setFlat(True)
+                # creating the display
+                button.setFlat(True)
                 button.setFixedSize(self.displays_size)
                 button.setIconSize(self.displays_size)
+                # adding the display to the grid
                 grid.addWidget(button, row, column)
+                # allowing the game to acces the display
                 self.game.add_display_ref(button, row, column)
 
     def on_window_size_changed(self, new_geo: QRect):
@@ -803,10 +823,16 @@ class GameWindow(QMainWindow):
         Args:
             new_geo (QRect): the new window size
         """
+        # dividing the new height of the window bvy 17
+        # (16 for the tiles + 1 for the tab bar at the top)
         new_dimensions = new_geo.height()//17
-        print(new_geo.height()//17)
+
+        # setting the dislpays_size property to be the enw size
         self.displays_size.setWidth(new_dimensions)
         self.displays_size.setHeight(new_dimensions)
+
+        # iterating through the displays and chanign their sizes to the new
+        # size
         for row in range(MAX_SIZE):
             for column in range(MAX_SIZE):
                 self.game.displays[row][column].setFixedSize(
@@ -818,6 +844,7 @@ class GameWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    # running the game
     window = GameWindow(True)
     window.show()
     app.exec()
