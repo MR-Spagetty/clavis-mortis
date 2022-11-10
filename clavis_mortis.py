@@ -28,19 +28,22 @@ try:
     import os
     import sys
 except ImportError as error:
+    # this error here should NEVER be seen if it is you have done something
+    # very wrong with your python instalation
     raise ImportError("WHAT HAVE YOU DONE") from error
 
 try:
     app = QApplication()
 except RuntimeError:
+    # little joke that shouldnt be ever seen
     print("So you imported me...")
 
 # chcecking if the game is bundled into an executable
 if getattr(sys, 'frozen', False):
-    application_path = os.path.dirname(sys.executable)
+    path_to_exe = os.path.dirname(sys.executable)
 elif __file__:
-    application_path = os.path.dirname(__file__)
-file_location = os.path.dirname(os.path.abspath(__file__))
+    path_to_exe = os.path.dirname(__file__)
+path_to_inside = os.path.dirname(os.path.abspath(__file__))
 
 # Checking that the user is using a version of python that has match cases
 if sys.version_info < (3, 10, 0):
@@ -54,7 +57,12 @@ MAX_SIZE = 16
 
 
 class Texture(QPixmap):
-    def __init__(self, path) -> None:
+    def __init__(self, path: str | bytes) -> None:
+        """the texture to be used by a tile or maybe even the players
+
+        Args:
+            path (str | bytes): the path to the texture file
+        """
         super(Texture, self).__init__(path)
 
     def get_path(full_texture_id: str):
@@ -70,10 +78,10 @@ class Texture(QPixmap):
         modid, texture_id = full_texture_id.split(':')
         infos = texture_id.split('.')
         if modid == "cm":
-            initial_folder = os.path.join(application_path, "tiles")
+            initial_folder = os.path.join(path_to_inside, "tiles")
         else:
             initial_folder = os.path.join(
-                file_location, "mods", modid, "tiles"
+                path_to_exe, "mods", modid, "tiles"
                 )
 
         with open(os.path.join(initial_folder, "tiles.json")) as reference:
@@ -107,6 +115,7 @@ class CodeDialog(QDialog):
         """function to verify the code entered by the user
         """
         if self.entry.text() == self.lock.code:
+            # you got the code right
             self.lock.state = False
             QMessageBox(
                 QMessageBox.Icon.Information, "Accepted",
@@ -114,12 +123,17 @@ class CodeDialog(QDialog):
                 QMessageBox.Ok
             ).exec()
         else:
+            # you got the code wrong
             reset = self.lock.increment_failures()
             QMessageBox(
                 QMessageBox.Icon.Warning, "Denied",
+                # the dialog you will get if you failed to enter the code
+                # correctly and the code has been randomized
                 "the code you entered was incorrect\n"
                 "the lock is still locked\n"
                 "perhapse i should check the code again" if reset else
+                # the dialog you will get if you failed to enter the code
+                # correctly and the cdoe has NOT been randomized
                 "the code you entered was incorrect\n"
                 "the lock is still locked",
                 QMessageBox.Ok
@@ -229,10 +243,22 @@ class Coordinate:
 class Player:
     texture = Texture(Texture.get_path("cm:player"))
 
-    def __init__(self, game: "Game", level: "Level",
+    def __init__(self, game: "Game",
                  layer: str, x: int, y: int,
                  update_function: "function"
                  ):
+        """the player, aguably the most important part of the game
+        without this object you would not be able to play let alone complete
+        the game
+
+        Args:
+            game (Game): the game object that created this player
+            layer (str): the layer the player is to start on
+            x (int): the x coordinate the player is to start at
+            y (int): the y coordinate the plaeyr is to start at
+            update_function (function): the function the player will run after
+            moveing in some way to update the game's displays
+        """
         self.game = game
         self.layer = layer
         self.x = x
@@ -240,6 +266,14 @@ class Player:
         self.update = update_function
 
     def move(self, direction: str, ammount: int = 1):
+        """simply moves the player in the specified direction by the specifed
+        number of tiles
+
+        Args:
+            direction (str): the direction to move the player
+            ammount (int, optional): the number of tiles to move the player.
+            Defaults to 1.
+        """
         match direction:
             case "up" | "north":
                 self.y -= ammount
@@ -252,10 +286,21 @@ class Player:
         self.update()
 
     def teleport(self, new_coord: Coordinate):
+        """sets the players layer and position to the specified coordinate
+
+        Args:
+            new_coord (Coordinate): the position and layer to teleport the
+            player to
+        """
         self.layer, self.x, self.y = new_coord()
         self.update()
 
     def dialog(self, dialog: str):
+        """prompts the player with a dialog
+
+        Args:
+            dialog (str): the message to haev in the dialog prompt
+        """
         QMessageBox(
             QMessageBox.Icon.NoIcon, "Dialog", dialog
             ).exec()
@@ -269,6 +314,21 @@ class Tile:
         locked: bool = False,
         lock: Lock = None
             ):
+        """the humble tile is what a level is made of many of.
+        They can come in various textures and functions all you need to do is
+        tell them what they are and what they look like
+
+        Args:
+            texture (Texture): the texture this tile will show
+            function (str, optional): the function this tile will server,
+            if None it will do nothing but sit there. Defaults to None.
+            function_arg (str, optional): any special argument for this tile
+            not applicable to non functional tiles. Defaults to None.
+            locked (bool, optional): whether this tile is locked or not, only
+            applicable to doors (through and normal). Defaults to False.
+            lock (Lock, optional): the lock to lock the door with,
+            only applicable to locked doors. Defaults to None.
+        """
         self.texture = QIcon(texture)
         self.function = function
         self.function_arg = function_arg
@@ -281,17 +341,56 @@ class Tile:
             self.locked = lambda: False
 
     def attempt_entry(self, player: Player, direction_attempted: str):
+        """a method to tell the player what to do when the attempt to enter
+        this tile
+
+        Args:
+            player (Player): the player to give the instruction too
+            direction_attempted (str): the direction the player attemted to
+            move to get into this tile
+        """
         match self.function:
             case None:
+                # if the tile is not a special tile it will simply\
+                # move the player
                 player.move(direction_attempted)
             case "door":
+                # if the tile is a door it will first check if it is locked
                 if self.locked():
-                    CodeDialog(self.lock).exec()
+                    # if it is locked it will prompt the player to enter the
+                    # code of the lock if applicable otherwise just inform the
+                    # user that they are unable to unlock it
+                    # (locked from the other side)
+                    if self.lock:
+                        CodeDialog(self.lock).exec()
+                    else:
+                        player.dialog("The door is locked from the other side")
                 else:
+                    # if the door is not locked it will teleport the player to
+                    # the appropriate location
                     player.teleport(Coordinate(self.function_arg))
             case "through-door":
-                player.move(direction_attempted, 2)
+                # if the tile is a through door it will first check if it is
+                # locked
+                if self.locked():
+                    # if it is locked it will prompt the player to enter the
+                    # code of the lock if applicable otherwise just inform the
+                    # user that they are unable to unlock it
+                    # (locked from the other side)
+                    if self.lock:
+                        CodeDialog(self.lock).exec()
+                    else:
+                        player.dialog("The door is locked from the other side")
+                else:
+                    # if the through door is not locked it will move the
+                    # player to the opposite side to that from which they
+                    # approched
+                    player.move(direction_attempted, 2)
             case "code":
+                # if the tile is a code tile then the player will recieve a
+                # little dialog about a note left for someone named John, who
+                # appears to be a security risk, that contains the code to a
+                # door
                 player.dialog(
                     "You find a note, on it is written:\n"
                     "\"John remember the code this time\n"
@@ -299,15 +398,27 @@ class Tile:
                     "\"\nMan this John guy is a real security risk"
                 )
             case "dialog":
+                # if the tile is a dialog tile the player will recieve a
+                # dialog contaning the dialog specified for this tile by the
+                # level file
                 player.dialog(self.function_arg)
             case "wall":
+                # if the tile is a wall tile the player will be informed that
+                # the obeject they just walked into is a wall
                 player.dialog("That is a wall.")
             case "end":
+                # if the tile is a end tile the level will end
                 player.game.level.end(player.game)
 
 
 class Level:
     def __init__(self, game: "Game", path: str | bytes):
+        """the constructor for any level of the game
+
+        Args:
+            game (Game): the game object that this level is being created in
+            path (str | bytes): the path to the file for this level
+        """
         self.textures = {}
         self.map = {}
         self.locks = {
@@ -348,10 +459,10 @@ class Level:
         modid, level_id = full_level_id.split(':')
         infos = level_id.split('.')
         if modid == "cm":
-            initial_folder = os.path.join(application_path, "levels")
+            initial_folder = os.path.join(path_to_inside, "levels")
         else:
             initial_folder = os.path.join(
-                file_location, "mods", modid, "levels"
+                path_to_exe, "mods", modid, "levels"
                 )
 
         with open(os.path.join(initial_folder, "levels.json")) as reference:
@@ -365,15 +476,35 @@ class Level:
         return os.path.join(initial_folder, *tile_path)
 
     def load_textures(self, tile_key: dict):
+        """loads all the textures required by the level
+
+        Args:
+            tile_key (dict): the textures to be loaded and their keys that
+            they will be referenced as when constructing the map
+        """
         for key, texture_id in tile_key.items():
             self.textures[key] = Texture(Texture.get_path(texture_id))
 
     def fill_layer(self, layer_id: str):
+        """method to prep a layer to be filled with tiles if it does not
+        already exist
+
+        Args:
+            layer_id (str): the id of the layer to be preped
+        """
         self.map[layer_id] = {y: {} for y in range(16)}
 
     def setup_end(self,
                   end_coord: Coordinate,
                   layers: dict):
+        """sets up the end tile of the map
+
+        Args:
+            end_coord (Coordinate): the location that the end tile will be
+            placed at
+            layers (dict): the data from which the texture for this tile will
+            be derived
+        """
         lay, x, y = end_coord()
         # creating the tile
         self.map[lay][y][x] = Tile(
@@ -381,6 +512,16 @@ class Level:
         )
 
     def construct_walls(self, walls_data: list, layers: dict):
+        """constructs the walls that are within the level
+
+        Args:
+            walls_data (list): a list of the walls in the level
+            layers (dict): the data from which the textures for these tiles
+            can be derived
+
+        Raises:
+            ValueError: if a wall does not start and end on the same layer
+        """
         for wall in walls_data:
             start, end = wall.split(":")
             s_lay, s_x, s_y = Coordinate(start)()
@@ -402,6 +543,13 @@ class Level:
                     )
 
     def assemble_functional_tiles(self, functions: dict, layers: dict):
+        """assembles all the functinoal tiles in the level
+
+        Args:
+            functions (dict): the functional tiles to setup
+            layers (dict): the data from which the textures for these tiles
+            can be derived
+        """
         global MAX_SIZE
         for location, data in functions.items():
             lay, x, y = Coordinate(location)()
@@ -433,9 +581,17 @@ class Level:
             )
 
     def construct_map(self, layers: dict):
+        """constructs the map as plain tiles with the textures specified in
+        the level data
+
+        Args:
+            layers (dict): the level data to get the texture keys from
+        """
         global MAX_SIZE
+        # itterating through each layer in the level data
         for layer_id, layer in layers.items():
             if layer_id not in self.map:
+                # setting up layers that do not already exist
                 self.fill_layer(layer_id)
             # itterating through the x and y coords the map
             for y in range(MAX_SIZE):
@@ -449,6 +605,11 @@ class Level:
                         )
 
     def end(self, game: "Game"):
+        """method for when the player complete the level
+
+        Args:
+            game (Game): the game object the level is running in
+        """
         if game.demo_mode:
             end_dialog = QMessageBox(
                 QMessageBox.Icon.NoIcon, "Level_complete",
@@ -478,31 +639,47 @@ class Game:
         self.level = None
         self.player = None
 
+        # adding a reference to the parent window to be used later
         self.window = window
+
+        # storing whether the game is in demo mode
         self.demo_mode = demo_mode
 
+        # creating the up key and binding it to the move method
         self.up_key = QShortcut(window)
         self.up_key.setKey('w')
         self.up_key.activated.connect(lambda: self.move_player(self.UP))
 
+        # creating the down key and binding it to the move method
         self.down_key = QShortcut(window)
         self.down_key.setKey('s')
         self.down_key.activated.connect(lambda: self.move_player(self.DOWN))
 
+        # creating the left key and binding it to the move method
         self.left_key = QShortcut(window)
         self.left_key.setKey('a')
         self.left_key.activated.connect(lambda: self.move_player(self.LEFT))
 
+        # creating the right key and binding it to the move method
         self.right_key = QShortcut(window)
         self.right_key.setKey('d')
         self.right_key.activated.connect(lambda: self.move_player(self.RIGHT))
 
+        # determining the the game is in demo mode and if so running the demo
+        # level
         if demo_mode:
             self.load_level("cm:demo")
         else:
+            # only a demo has been made at this point in time so you can't
+            # play the non demo
             raise RuntimeError("You're not allowed to do that")
 
     def load_level(self, level_id: str):
+        """loads the level with the specified id
+
+        Args:
+            level_id (str): the id of the level to load
+        """
         level_path = Level.get_path(level_id)
         self.level = Level(self, level_path)
 
@@ -534,11 +711,17 @@ class Game:
             location (Coordinate): the location to create the player at
         """
         self.player = Player(
-            self, self.level, *location(),
+            self, *location(),
             self.update_displays
             )
 
-    def move_player(self, direction):
+    def move_player(self, direction: tuple[int, int, str]):
+        """method to move the player when a direction key is pressed
+
+        Args:
+            direction (tuple): a tuple of the relative coordinates and name of
+            the direction from the player in the format (x, y, name)
+        """
         if self.window.centralWidget().currentIndex() == 1:
             dir_x, dir_y, dir_name = direction
             x = self.player.x + dir_x
@@ -599,7 +782,7 @@ class GameWindow(QMainWindow):
             self.centralWidget().setCurrentIndex(1)
 
     def setup_displays(self):
-        """method to setup teh displays of the window
+        """method to setup the displays of the window
         """
         global MAX_SIZE
         grid = self.game_display_layout
