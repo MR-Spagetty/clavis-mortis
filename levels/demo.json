@@ -6,15 +6,23 @@
         "ground.d": "cm:outside.ground.dirt",
         "ground.g": "cm:outside.ground.grass",
 
-        "door.h": "cm:other.feature.horizontal_door",
-        "door.v": "cm:other.feature.vertical_door",
+        "door.H": "cm:other.feature.horizontal_door",
+        "door.V": "cm:other.feature.vertical_door",
+        "bookshelf": "cm:other.feature.bookshelf",
 
         "border.V": "cm:outside.wall.vertical",
         "border.H": "cm:outside.wall.horizontal",
         "border.NE": "cm:outside.wall.north-east",
         "border.SE": "cm:outside.wall.south-east",
         "border.SW": "cm:outside.wall.south-west",
-        "border.NW": "cm:outside.wall.north-west"
+        "border.NW": "cm:outside.wall.north-west",
+
+        "wall.plain.V": "cm:inside.wall.vertical.plain",
+        "wall.plain.H": "cm:inside.wall.horizontal.plain",
+        "wall.plain.NE": "cm:inside.wall.north-east.plain",
+        "wall.plain.SE": "cm:inside.wall.south-east.plain",
+        "wall.plain.SW": "cm:inside.wall.south-west.plain",
+        "wall.plain.NW": "cm:inside.wall.north-west.plain"
     },
     "level": {
         "layers": {
@@ -33,26 +41,132 @@
                 ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
                 ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
                 ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
-                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "door.v", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.NE", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.NW"]
+            ],
+            "2": [
+                ["wall.plain.SE", "bookshelf", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.SW"],
+                ["wall.plain.V", "ground.d", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.NE", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.NW"]
+            ],
+            "3": [
+                ["wall.plain.SE", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "bookshelf", "wall.plain.H", "wall.plain.H", "wall.plain.SW"],
+                ["wall.plain.V", "ground.d", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "wall.plain.V"],
+                ["wall.plain.NE", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.NW"]
+            ],
+            "dev": [
+                ["border.SE", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.SW"],
+                ["door.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.d", "ground.g", "ground.g", "ground.d", "ground.d", "ground.d", "ground.g", "ground.d", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.g", "ground.d", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "ground.d", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.g", "ground.d", "ground.g", "ground.d", "ground.d", "ground.d", "ground.g", "ground.d", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.g", "ground.d", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.d", "ground.g", "ground.g", "ground.d", "ground.d", "ground.d", "ground.g", "ground.g", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
                 ["border.NE", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.NW"]
             ]
         },
         "walls": [
             "1,0x,0y:1,0x,15y",
-            "1,0x,0y:1,6x,0y",
-            "1,8x,0y:1,15x,0y",
+            "1,0x,0y:1,15x,0y",
             "1,0x,15y:1,15x,15y",
-            "1,15x,0y:1,15x,15y"
+            "1,15x,0y:1,15x,15y",
+
+            "2,0x,0y:2,0x,15y",
+            "2,0x,0y:2,15x,0y",
+            "2,0x,15y:2,15x,15y",
+            "2,15x,0y:2,15x,15y",
+
+            "3,0x,0y:3,0x,15y",
+            "3,0x,0y:3,15x,0y",
+            "3,0x,15y:3,15x,15y",
+            "3,15x,0y:3,15x,15y",
+
+            "dev,0x,0y:dev,0x,15y",
+            "dev,0x,0y:dev,15x,0y",
+            "dev,0x,15y:dev,15x,15y",
+            "dev,15x,0y:dev,15x,15y"
         ],
         "functions": {
-            "1,6x,0y": {
+            "1,7x,0y": {
                 "type": "door",
                 "has_lock": false,
                 "lock_id": "",
-                "goes_to": "1,1x,1y"
+                "goes_to": "2,7x,14y"
+            },
+            "1,15x,14y": {
+                "type": "door",
+                "has_lock": false,
+                "lock_id": "",
+                "goes_to": "dev,1x,1y"
+            },
+            "dev,0x,1y": {
+                "type": "door",
+                "has_lock": false,
+                "lock_id": "",
+                "goes_to": "1,14x,14y"
+            },
+            "2,7x,15y": {
+                "type": "door",
+                "has_lock": false,
+                "lock_id": "",
+                "goes_to": "1,7x,1y"
+            },
+            "2,7x,0y": {
+                "type": "door",
+                "has_lock": true,
+                "lock_id": "part2",
+                "goes_to": "3,7x,14y"
+            },
+            "2,1x,0y": {
+                "type": "code",
+                "lock_id": "part2"
+            },
+            "3,7x,15y": {
+                "type": "door",
+                "has_lock": false,
+                "lock_id": "",
+                "goes_to": "2,7x,1y"
+            },
+            "3,12x,0y": {
+                "type": "dialog",
+                "text": "Not all bookshelves have useful information.\nSome are just for decoration"
             }
         },
         "start": "1,1x,1y",
-        "end": "1,14x,14y"
+        "end": "3,7x,0y"
     }
 }
