@@ -103,6 +103,7 @@ class CodeDialog(QDialog):
             lock (Lock): the lock for the code to be attempted with
         """
         super(CodeDialog, self).__init__()
+        self.setWindowTitle("Enter code")
         self.lock = lock
         self.entry = QLineEdit()
         self.submit = QPushButton("Submit")
