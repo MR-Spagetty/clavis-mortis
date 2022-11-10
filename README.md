@@ -3,7 +3,7 @@
 Clavis mortis is a simple game where you, the player, are a creepy mischievous disembodied head.
 your goal in the game is to find your way to the final door of each level often through other doors with poorly secured code locks thanks to John who cannot remember any codes so his coworkers must leave them for him on notes you may find on bookshelves or other objects.
 
-### Disclamer
+### Disclaimer
 
 Currently there is only a single level demo for the game which contains the basics of playing the game (doors codes and multiple layers)
 
@@ -11,6 +11,8 @@ Currently there is only a single level demo for the game which contains the basi
 
 to move around in the game you sue the W, A, S, and D keys
 to interact with a tile such as a door you simply attempt to move into it
+
+You as the player are filled with self doubt thus after can only get a code wrong three times before you must check it again this self doubt is your stamina.
 
 ## Running from source code
 
