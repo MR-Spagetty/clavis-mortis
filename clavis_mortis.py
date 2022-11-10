@@ -296,6 +296,7 @@ class Tile:
                     "You find a note, on it is written:\n"
                     "\"John remember the code this time\n"
                     f"code: {player.game.level.locks[self.function_arg].code}"
+                    "\"\nMan this Jhon guy is a real security risk"
                 )
             case "dialog":
                 player.dialog(self.function_arg)
