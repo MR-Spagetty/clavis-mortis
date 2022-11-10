@@ -88,6 +88,8 @@ class Texture(QPixmap):
             mod_tile_reference_sheet = json.load(reference)
         texture_path = []
         navigator = mod_tile_reference_sheet.copy()
+        # itterating through each part of the texture id in the reference
+        # sheet to get the final path
         for info in infos[:-1]:
             texture_path.append(info)
             navigator = navigator.copy()[info]
@@ -470,6 +472,8 @@ class Level:
             mod_tile_reference_sheet = json.load(reference)
         tile_path = []
         navigator = mod_tile_reference_sheet.copy()
+        # itterates through each part of the level id in the reference sheet
+        # to get the final path
         for info in infos[:-1]:
             tile_path.append(info)
             navigator = navigator.copy()[info]
