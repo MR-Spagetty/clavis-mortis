@@ -9,7 +9,7 @@ try:
         QTabWidget, QLabel, QDialog, QLineEdit,
         QVBoxLayout, QHBoxLayout, QMessageBox
     )
-    from PySide6.QtGui import QIcon, QPixmap, QScreen
+    from PySide6.QtGui import QIcon, QPixmap, QScreen, QShortcut
     from PySide6.QtCore import Qt, QSize, QSizeF, QRect
 except ImportError as qt_er:
     raise ImportError("'PySide6' is required to run this game.") from qt_er
@@ -229,7 +229,7 @@ class Player:
         self.x = x
         self.y = y
         self.update = update_function
-        
+
         self.update()
 
     def move(self, direction: str, ammount: int = 1):
@@ -392,14 +392,42 @@ class Level:
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, window: QMainWindow, demo_mode: bool = False):
+        """constructor class of the game
+
+        Args:
+            window (QMainWindow): the window the game is running in
+        """
         self.displays = {
             y: {} for y in range(MAX_SIZE)
         }
         self.level = None
         self.player = None
+        self.up_key = QShortcut(window)
+        self.up_key.setKey('w')
+
+        self.down_key = QShortcut(window)
+        self.down_key.setKey('s')
+
+        self.left_key = QShortcut(window)
+        self.left_key.setKey('a')
+
+        self.right_key = QShortcut(window)
+        self.right_key.setKey('d')
+
+        if demo_mode:
+            self.load_level("cm:demo")
+        else:
+            raise RuntimeError("You're not allowed to do that")
 
     def add_display_ref(self, display: QPushButton, y: int, x: int):
+        """adds a reference ot a display in the window to the game object
+
+        Args:
+            display (QPushButton): the display to add a reference to
+            y (int): the row the display is on in the display matrix
+            x (int): the column the display is on in the display matrix
+        """
         self.displays[y][x] = display
 
     def update_displays(self):
@@ -426,13 +454,22 @@ class Game:
 
 
 class GameWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, demo_mode: bool = False):
+        """the constructor class for the game_window.
+
+        Args:
+            demo_mode (bool): _description_
+        """
         super(GameWindow, self).__init__()
         self.setCentralWidget(QTabWidget())
 
         self.centralWidget().addTab(QWidget(), "Menu")
 
-        self.game = Game()
+        self.game = Game(self, demo_mode)
+
+        pause_key = QShortcut(self)
+        pause_key.setKey("esc")
+        pause_key.activated.connect(self.pause)
 
         self.game_display_layout = QGridLayout()
         self.game_display_layout.setContentsMargins(0, 0, 0, 0)
@@ -446,7 +483,7 @@ class GameWindow(QMainWindow):
         game_tab.layout().addWidget(game_display_layout_widget)
         game_tab.layout().addWidget(QWidget())
 
-        self.centralWidget().addTab(game_tab, "Layer 1")
+        self.centralWidget().addTab(game_tab, "Game")
 
         self.screen().geometryChanged.connect(self.on_window_size_changed)
         display_height_width = self.screen().geometry().height()//17
@@ -454,40 +491,51 @@ class GameWindow(QMainWindow):
 
         self.setup_displays()
 
+    def pause(self):
+        """method to toggle the pause state of the game
+        """
+        if self.centralWidget().currentIndex() == 1:
+            self.centralWidget().setCurrentIndex(0)
+        else:
+            self.centralWidget().setCurrentIndex(1)
+
     def setup_displays(self):
+        """method to setup teh displays of the window
+        """
         global MAX_SIZE
         grid = self.game_display_layout
         for row in range(MAX_SIZE):
             for column in range(MAX_SIZE):
                 button = QPushButton()
 
-                button.setFlat(True)
+                # button.setFlat(True)
                 button.setFixedSize(self.displays_size)
                 button.setIconSize(self.displays_size)
                 grid.addWidget(button, row, column)
                 self.game.add_display_ref(button, row, column)
 
-    def change_displays(self):
-        pass
-
     def on_window_size_changed(self, new_geo: QRect):
+        """method to change the size of the displays when the window size is
+        changed
+
+        Args:
+            new_geo (QRect): the new window size
+        """
         new_dimensions = new_geo.height()//17
         print(new_geo.height()//17)
         self.displays_size.setWidth(new_dimensions)
         self.displays_size.setHeight(new_dimensions)
-        grid = self.game_display_layout
         for row in range(MAX_SIZE):
             for column in range(MAX_SIZE):
-                button = QPushButton()
-
-                button.setFlat(True)
-                button.setFixedSize(self.displays_size)
-                button.setIconSize(self.displays_size)
-                grid.addWidget(button, row, column)
-                self.game.add_display_ref(button, row, column)
+                self.game.displays[row][column].setFixedSize(
+                    self.displays_size
+                    )
+                self.game.displays[row][column].setIconSize(
+                    self.displays_size
+                    )
 
 
 if __name__ == "__main__":
-    window = GameWindow()
+    window = GameWindow(True)
     window.show()
     app.exec()
