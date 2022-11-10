@@ -1,0 +1,58 @@
+{
+    "tile_key": {
+        "ground.b": "cm:outside.ground.bricks",
+        "ground.p": "cm:inside.ground.planks",
+        "ground.c": "cm:other.ground.concrete",
+        "ground.d": "cm:outside.ground.dirt",
+        "ground.g": "cm:outside.ground.grass",
+
+        "door.h": "cm:other.feature.horizontal_door",
+        "door.v": "cm:other.feature.vertical_door",
+
+        "border.V": "cm:outside.wall.vertical",
+        "border.H": "cm:outside.wall.horizontal",
+        "border.NE": "cm:outside.wall.north-east",
+        "border.SE": "cm:outside.wall.south-east",
+        "border.SW": "cm:outside.wall.south-west",
+        "border.NW": "cm:outside.wall.north-west"
+    },
+    "level": {
+        "layers": {
+            "1": [
+                ["border.SE", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "door.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.SW"],
+                ["border.V", "ground.d", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.d", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "border.V"],
+                ["border.V", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "ground.g", "door.v", "border.V"],
+                ["border.NE", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.H", "border.NW"]
+            ]
+        },
+        "walls": [
+            "1,0x,0y:1,0x,15y",
+            "1,0x,0y:1,6x,0y",
+            "1,8x,0y:1,15x,0y",
+            "1,0x,15y:1,15x,15y",
+            "1,15x,0y:1,15x,15y"
+        ],
+        "functions": {
+            "1,6x,0y": {
+                "type": "door",
+                "has_lock": false,
+                "lock_id": "",
+                "goes_to": "1,1x,1y"
+            }
+        },
+        "start": "1,1x,1y",
+        "end": "1,14x,14y"
+    }
+}
