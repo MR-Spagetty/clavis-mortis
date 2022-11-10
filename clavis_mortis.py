@@ -114,10 +114,14 @@ class CodeDialog(QDialog):
                 QMessageBox.Ok
             ).exec()
         else:
-            self.lock.increment_failures()
+            reset = self.lock.increment_failures()
             QMessageBox(
                 QMessageBox.Icon.Warning, "Denied",
-                "the code you entered was incorrect\nthe lock is still locked",
+                "the code you entered was incorrect\n"
+                "the lock is still locked\n"
+                "perhapse i should check the code again" if reset else
+                "the code you entered was incorrect\n"
+                "the lock is still locked",
                 QMessageBox.Ok
             ).exec()
         self.close()
@@ -138,7 +142,7 @@ class Lock:
     def randomize_code(self):
         """randomizes the code
         """
-        self.code = random.sample(Lock.chars, 6)
+        self.code = "".join(random.sample(Lock.chars, 6))
 
     def increment_failures(self):
         """if the player inputs the code in wrong this method will keep track
@@ -149,6 +153,8 @@ class Lock:
         if self.fails >= 3:
             self.fails = 0
             self.randomize_code()
+            return True
+        return False
 
     def get_state(self):
         """gets the state of the lock
@@ -267,16 +273,19 @@ class Tile:
         self.function = function
         self.function_arg = function_arg
         self.lock = lock
-        if locked:
-            self.lock.get_state()
-        self.locked = locked
+        if lock:
+            self.locked = self.lock.get_state
+        elif locked:
+            self.locked = lambda: True
+        else:
+            self.locked = lambda: False
 
     def attempt_entry(self, player: Player, direction_attempted: str):
         match self.function:
             case None:
                 player.move(direction_attempted)
             case "door":
-                if self.locked:
+                if self.locked():
                     CodeDialog(self.lock).exec()
                 else:
                     player.teleport(Coordinate(self.function_arg))
@@ -284,8 +293,12 @@ class Tile:
                 player.move(direction_attempted, 2)
             case "code":
                 player.dialog(
-                    ""
+                    "You find a note, on it is written:\n"
+                    "\"John remember the code this time\n"
+                    f"code: {player.game.level.locks[self.function_arg].code}"
                 )
+            case "dialog":
+                player.dialog(self.function_arg)
             case "wall":
                 player.dialog("That is a wall.")
             case "end":
@@ -296,7 +309,9 @@ class Level:
     def __init__(self, game: "Game", path: str | bytes):
         self.textures = {}
         self.map = {}
-        self.locks = {}
+        self.locks = {
+            None: None, "": None
+            }
         with open(path, 'r') as level:
             data = json.load(level)
 
@@ -399,6 +414,8 @@ class Level:
                     arg_name = "goes_to"
                 case "dialog":
                     arg_name = "text"
+                case "code":
+                    arg_name = "lock_id"
                 case other:
                     arg_name = "arg"
 
