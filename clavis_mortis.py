@@ -72,7 +72,9 @@ class Texture(QPixmap):
         if modid == "cm":
             initial_folder = os.path.join(application_path, "tiles")
         else:
-            initial_folder = os.path.join(file_location, "mods", modid)
+            initial_folder = os.path.join(
+                file_location, "mods", modid, "tiles"
+                )
 
         with open(os.path.join(initial_folder, "tiles.json")) as reference:
             mod_tile_reference_sheet = json.load(reference)
@@ -225,21 +227,20 @@ class Player:
                  layer: str, x: int, y: int,
                  update_function: "function"
                  ):
+        self.game = game
         self.layer = layer
         self.x = x
         self.y = y
         self.update = update_function
 
-        self.update()
-
     def move(self, direction: str, ammount: int = 1):
         match direction:
             case "up" | "north":
-                self.y += ammount
-            case "right" | "east":
-                self.y += ammount
-            case "down" | "south":
                 self.y -= ammount
+            case "right" | "east":
+                self.x += ammount
+            case "down" | "south":
+                self.y += ammount
             case "left" | "west":
                 self.x -= ammount
         self.update()
@@ -287,6 +288,8 @@ class Tile:
                 )
             case "wall":
                 player.dialog("That is a wall.")
+            case "end":
+                player.game.level.end(player.game)
 
 
 class Level:
@@ -308,21 +311,58 @@ class Level:
         self.start = Coordinate(level_data["start"])
         end = Coordinate(level_data["end"])
 
-        self.construct_walls(level_data["walls"])
+        self.construct_walls(level_data["walls"], layers)
+        self.assemble_functional_tiles(level_data["functions"], layers)
+        self.construct_map(layers)
 
-        game.player.teleport(self.start)
+        self.setup_end(end, layers)
+
+        game.create_player(self.start)
+
+    def get_path(full_level_id: str):
+        """Static method to get the path to the level file
+        from the given full level id.
+
+        Args:
+            full_level_id (str): the full id of the level
+
+        Returns:
+            str: the path to the level file
+        """
+        modid, level_id = full_level_id.split(':')
+        infos = level_id.split('.')
+        if modid == "cm":
+            initial_folder = os.path.join(application_path, "levels")
+        else:
+            initial_folder = os.path.join(
+                file_location, "mods", modid, "levels"
+                )
+
+        with open(os.path.join(initial_folder, "levels.json")) as reference:
+            mod_tile_reference_sheet = json.load(reference)
+        tile_path = []
+        navigator = mod_tile_reference_sheet.copy()
+        for info in infos[:-1]:
+            tile_path.append(info)
+            navigator = navigator.copy()[info]
+        tile_path.append(navigator[infos[-1]])
+        return os.path.join(initial_folder, *tile_path)
 
     def load_textures(self, tile_key: dict):
         for key, texture_id in tile_key.items():
             self.textures[key] = Texture(Texture.get_path(texture_id))
 
     def fill_layer(self, layer_id: str):
-        self.map[layer_id] = [[None * MAX_SIZE] * MAX_SIZE]
+        self.map[layer_id] = {y: {} for y in range(16)}
 
     def setup_end(self,
                   end_coord: Coordinate,
                   layers: dict):
-        pass
+        lay, x, y = end_coord()
+        # creating the tile
+        self.map[lay][y][x] = Tile(
+            self.textures[layers[lay][y][x]], "end"
+        )
 
     def construct_walls(self, walls_data: list, layers: dict):
         for wall in walls_data:
@@ -383,15 +423,31 @@ class Level:
             for y in range(MAX_SIZE):
                 for x in range(MAX_SIZE):
                     # creating the tile
-                    if self.map[layer_id][y][x] is None:
+                    if self.map[layer_id][y].get(x) is None:
                         self.map[layer_id][y][x] = Tile(
                             Texture(
                                 self.textures[layer[y][x]]
                                 )
                         )
 
+    def end(self, game: "Game"):
+        if game.demo_mode:
+            end_dialog = QMessageBox(
+                QMessageBox.Icon.NoIcon, "Level_complete",
+                "Congrats you completed the demo",
+                QMessageBox.Close
+            )
+            end_dialog.exec()
+            exit()
+
 
 class Game:
+    #     x, y, name
+    UP = (0, 1, "up")
+    DOWN = (0, -1, "down")
+    LEFT = (-1, 0, "left")
+    RIGHT = (1, 0, "right")
+
     def __init__(self, window: QMainWindow, demo_mode: bool = False):
         """constructor class of the game
 
@@ -403,22 +459,34 @@ class Game:
         }
         self.level = None
         self.player = None
+
+        self.window = window
+        self.demo_mode = demo_mode
+
         self.up_key = QShortcut(window)
         self.up_key.setKey('w')
+        self.up_key.activated.connect(lambda: self.move_player(self.UP))
 
         self.down_key = QShortcut(window)
         self.down_key.setKey('s')
+        self.down_key.activated.connect(lambda: self.move_player(self.DOWN))
 
         self.left_key = QShortcut(window)
         self.left_key.setKey('a')
+        self.left_key.activated.connect(lambda: self.move_player(self.LEFT))
 
         self.right_key = QShortcut(window)
         self.right_key.setKey('d')
+        self.right_key.activated.connect(lambda: self.move_player(self.RIGHT))
 
         if demo_mode:
             self.load_level("cm:demo")
         else:
             raise RuntimeError("You're not allowed to do that")
+
+    def load_level(self, level_id: str):
+        level_path = Level.get_path(level_id)
+        self.level = Level(self, level_path)
 
     def add_display_ref(self, display: QPushButton, y: int, x: int):
         """adds a reference ot a display in the window to the game object
@@ -451,6 +519,18 @@ class Game:
             self, self.level, *location(),
             self.update_displays
             )
+
+    def move_player(self, direction):
+        if self.window.centralWidget().currentIndex() == 1:
+            dir_x, dir_y, dir_name = direction
+            x = self.player.x + dir_x
+            y = self.player.y - dir_y
+            self.level.map[self.player.layer][y][x].attempt_entry(
+                self.player, dir_name
+                )
+
+    def start(self):
+        self.player.update()
 
 
 class GameWindow(QMainWindow):
@@ -490,6 +570,7 @@ class GameWindow(QMainWindow):
         self.displays_size = QSize(display_height_width, display_height_width)
 
         self.setup_displays()
+        self.game.start()
 
     def pause(self):
         """method to toggle the pause state of the game
