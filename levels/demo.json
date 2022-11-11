@@ -21,7 +21,8 @@
         "wall.plain.NE": "cm:inside.wall.north-east.plain",
         "wall.plain.SE": "cm:inside.wall.south-east.plain",
         "wall.plain.SW": "cm:inside.wall.south-west.plain",
-        "wall.plain.NW": "cm:inside.wall.north-west.plain"
+        "wall.plain.NW": "cm:inside.wall.north-west.plain",
+        "wall.plain.i": "cm:inside.wall.intersection.plain"
     },
     "level": {
         "layers": {
@@ -62,9 +63,9 @@
                 ["wall.plain.NE", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.NW"]
             ],
             "3": [
-                ["wall.plain.SE", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "bookshelf", "wall.plain.H", "wall.plain.H", "wall.plain.SW"],
-                ["wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
-                ["wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
+                ["wall.plain.SE", "wall.plain.H", "wall.plain.i", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "door.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "wall.plain.H", "bookshelf", "wall.plain.H", "wall.plain.H", "wall.plain.SW"],
+                ["wall.plain.V", "ground.c", "wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
+                ["wall.plain.SE", "door.H", "wall.plain.NW", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
                 ["wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
                 ["wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
                 ["wall.plain.V", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "ground.p", "wall.plain.V"],
@@ -113,6 +114,7 @@
             "3,0x,0y:3,15x,0y",
             "3,0x,15y:3,15x,15y",
             "3,15x,0y:3,15x,15y",
+            "3,2x,0y:3,2x,2y",
 
             "dev,0x,0y:dev,0x,15y",
             "dev,0x,0y:dev,15x,0y",
@@ -159,6 +161,11 @@
                 "has_lock": false,
                 "lock_id": "",
                 "goes_to": "2,7x,1y"
+            },
+            "3,1x,2y": {
+                "type": "through-door",
+                "has_lock": false,
+                "lock_id": ""
             },
             "3,12x,0y": {
                 "type": "dialog",
