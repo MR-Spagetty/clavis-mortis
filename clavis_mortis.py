@@ -753,7 +753,41 @@ class GameWindow(QMainWindow):
         super(GameWindow, self).__init__()
         self.setCentralWidget(QTabWidget())
 
-        self.centralWidget().addTab(QWidget(), "Menu")
+        menu_widget = QWidget()
+        menu_layout = QVBoxLayout()
+        menu_widget.setLayout(menu_layout)
+
+        # creating the start/resume button
+        self.start_resume_button = QPushButton()
+        # setting the size of the button
+        self.start_resume_button.setFixedHeight(80)
+        self.start_resume_button.setFixedWidth(300)
+        # setting up the text and text size
+        self.start_resume_button.setText("Start")
+        self.start_resume_button.setStyleSheet("font-size: 70px")
+        # binding the button to the pause function
+        self.start_resume_button.clicked.connect(
+            self.pause
+            )
+        menu_layout.addWidget(self.start_resume_button)
+
+        # creating a quit button
+        quit_button = QPushButton()
+        # setting the size of the button
+        quit_button.setFixedHeight(80)
+        quit_button.setFixedWidth(300)
+        # setting up the text and text size
+        quit_button.setText("Quit")
+        quit_button.setStyleSheet("font-size: 70px")
+        # binding the button to quit the game
+        quit_button.clicked.connect(
+            # this is a lambda function so the exit doesn't accidentally get
+            # an exit code
+            lambda: sys.exit()
+            )
+        menu_layout.addWidget(quit_button)
+
+        self.centralWidget().addTab(menu_widget, "Menu")
 
         # creating the game to run in the window
         self.game = Game(self, demo_mode)
@@ -797,6 +831,7 @@ class GameWindow(QMainWindow):
     def pause(self):
         """method to toggle the pause state of the game
         """
+        self.start_resume_button.setText("Resume")
         if self.centralWidget().currentIndex() == 1:
             self.centralWidget().setCurrentIndex(0)
         else:
